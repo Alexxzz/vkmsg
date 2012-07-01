@@ -15,8 +15,8 @@
 #define kApiUrl @"https://api.vk.com/method/"
 
 #define kDirectLoginUrl @"https://api.vk.com/"
-#define kAppId @""
-#define kAppSecret @""
+#define kAppId @"2855155"
+#define kAppSecret @"5448ab16da2dd786edf"
 #define kAttachmentUploadPath @"upload.php"
 
 @implementation VKApi
@@ -395,7 +395,7 @@
 #pragma mark - Messages
 + (void)getDialogsListCount:(NSUInteger)count
                      offset:(NSUInteger)offset
-                    success:(void(^)(NSArray* messages))success 
+                    success:(void(^)(NSArray* messages ,NSInteger count))success 
                     failure:(void(^)(NSError* error, NSDictionary* errDict))failure
 {
     NSString* countStr = [[NSNumber numberWithUnsignedInteger:count] stringValue];
@@ -418,9 +418,15 @@
                                                          NSArray* resp = [JSON valueForKey:@"response"];
                                                          if (resp != nil)
                                                          {
+                                                             NSInteger count = 0;
                                                              NSMutableArray* messages = [NSMutableArray arrayWithCapacity:[JSON count]];
-                                                             for (NSDictionary* messageDict in resp)
+                                                             for (id messageDict in resp)
                                                              {
+                                                                 if ([messageDict isKindOfClass:[NSNumber class]])
+                                                                 {
+                                                                     count = [messageDict intValue];
+                                                                 }
+                                                                 
                                                                  if ([messageDict isKindOfClass:[NSDictionary class]])
                                                                  {                                                                 
                                                                      VKMessage* message = [VKMessage messageWithDictionary:messageDict];
@@ -429,7 +435,7 @@
                                                              }
                                                              
                                                              if (success != nil && failure != nil)
-                                                                 success([[messages copy] autorelease]);
+                                                                 success([[messages copy] autorelease], count);
                                                          }                                                         
                                                          else
                                                          {

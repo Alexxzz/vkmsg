@@ -117,17 +117,93 @@
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
+- (void)addLoadingFooterIfNeeded
+{
+    if (Storage.dialogsCount < Storage.dialogsTotalCount)
+        _tableView.tableFooterView = _loadMoreView;
+    else
+        _tableView.tableFooterView = nil;
+}
+
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
     
     [_tableView reloadData];
+    
+    [self addLoadingFooterIfNeeded];
 }
 
+#pragma mark - Getting more
+
 #pragma mark - IBActions
-- (IBAction)onNewDialog:(id)sender
+- (void)onNewDialog:(id)sender
 {
     
+}
+
+#pragma mark - Scroll delegate
+- (void)scrollViewDidScroll:(UIScrollView *)aScrollView 
+{
+    if (_isLoadingMore == YES || Storage.dialogsCount >= Storage.dialogsTotalCount)
+        return;
+    
+    CGPoint offset = aScrollView.contentOffset;
+    CGRect bounds = aScrollView.bounds;
+    CGSize size = aScrollView.contentSize;
+    UIEdgeInsets inset = aScrollView.contentInset;
+    float y = offset.y + bounds.size.height - inset.bottom;
+    float h = size.height;
+    
+    float reload_distance = 10;
+    if(y > h + reload_distance) 
+    {
+        NSLog(@"load more dialogs");
+        
+        _isLoadingMore = YES;
+        
+        [VKApi getDialogsListCount:kInitialDlgCount
+                            offset:Storage.dialogsCount 
+                           success:^(NSArray *messages, NSInteger count) {
+                               NSIndexPath* idx = [NSIndexPath indexPathForRow:([_tableView numberOfRowsInSection:0] - 1) 
+                                                                     inSection:0];
+                               
+                               Storage.dialogsCount += kInitialDlgCount;
+                               [self addLoadingFooterIfNeeded];
+                               Storage.dialogList = [Storage.dialogList arrayByAddingObjectsFromArray:messages];
+                               
+                               [_tableView reloadData];
+                               [_tableView scrollToRowAtIndexPath:idx 
+                                                 atScrollPosition:UITableViewScrollPositionBottom
+                                                         animated:NO];
+                               
+                               //Check for non-loaded friends
+                               NSMutableArray* newFriendsIds = [NSMutableArray array];
+                               for (VKMessage* msg in messages)
+                               {
+                                   VKUser* user = [Storage userWithId:msg.uid];
+                                   if (user == nil)//Should load user
+                                       [newFriendsIds addObject:msg.uid];
+                               }
+                               
+                               if ([newFriendsIds count] > 0)
+                               {
+                                   [VKApi getFriendsWithIds:newFriendsIds 
+                                                    success:^(NSArray *friends) {
+                                                        Storage.friends = [Storage.friends arrayByAddingObjectsFromArray:friends];
+                                                        
+                                                        NSArray* visibleRows = [_tableView indexPathsForVisibleRows];
+                                                        [_tableView reloadRowsAtIndexPaths:visibleRows withRowAnimation:UITableViewRowAnimationNone];
+                                                    } failure:^(NSError *error, NSDictionary *errDict) {
+                                                        
+                                                    }];
+                               }
+                               
+                               _isLoadingMore = NO;
+                           } failure:^(NSError *error, NSDictionary *errDict) {
+                               _isLoadingMore = NO;
+                           }];
+    }
 }
 
 #pragma mark - UITableView delegate/datasource

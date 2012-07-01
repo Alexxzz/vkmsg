@@ -10,6 +10,8 @@
 #define Storage [VKStorage storage]
 
 #define kInitialMsgCount 20
+#define kInitialDlgCount 20
+#define kInitialFriendsCount 100
 
 #import <UIKit/UIKit.h>
 #import "VKStorage.h"

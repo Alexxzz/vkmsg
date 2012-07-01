@@ -14,8 +14,12 @@
 {
     IBOutlet UITableView* _tableView;
     IBOutlet VKNavigationBar* _navBar;
+    IBOutlet UIView* _loadMoreView;
+    IBOutlet UIActivityIndicatorView* _activityIndicator;
+    
+    BOOL _isLoadingMore;
 }
 
-- (IBAction)onNewDialog:(id)sender;
+- (void)onNewDialog:(id)sender;
 
 @end

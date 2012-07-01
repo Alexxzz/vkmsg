@@ -60,7 +60,7 @@ typedef enum
 //Messages
 + (void)getDialogsListCount:(NSUInteger)count
                      offset:(NSUInteger)offset
-                    success:(void(^)(NSArray* messages))success 
+                    success:(void(^)(NSArray* messages ,NSInteger count))success 
                     failure:(void(^)(NSError* error, NSDictionary* errDict))failure;
 
 + (void)getMessagesHistoryForId:(NSNumber*)Id

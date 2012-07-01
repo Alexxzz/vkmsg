@@ -11,6 +11,7 @@
 #import "VKApi.h"
 #import "VKLongPollServerController.h"
 #import "VKAddressBook.h"
+#import "VKHelper.h"
 
 @interface AppDelegate()
 - (void)showSignIn;
@@ -120,10 +121,12 @@
 
 - (void)getDialogs
 {    
-    [VKApi getDialogsListCount:20 
+    [VKApi getDialogsListCount:kInitialDlgCount 
                         offset:0 
-                       success:^(NSArray *messages) {
+                       success:^(NSArray *messages, NSInteger count) {
                            Storage.dialogList = messages;
+                           Storage.dialogsCount = kInitialDlgCount;
+                           Storage.dialogsTotalCount = count;
                        } failure:^(NSError *error, NSDictionary* errDict) {
                            
                        }];
@@ -164,7 +167,7 @@
     splash.image = [UIImage imageNamed:@"Default@2x.png"];
     [self.window addSubview:splash];
     
-    [VKApi getFriendsListCount:100 
+    [VKApi getFriendsListCount:kInitialFriendsCount 
                         offset:0 
                          order:eVKFriendsOrder_hints 
                        success:^(NSArray *friends) {

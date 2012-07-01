@@ -17,7 +17,7 @@
 
 @implementation VKStorage
 
-@synthesize user, friends, dialogList, dialogs, favourites;
+@synthesize user, friends, dialogList, dialogs, favourites, friendsCount, friendsTotalCount, dialogsCount, dialogsTotalCount;
 
 #pragma mark - singeltone methods
 static VKStorage* storageInstance = nil;
