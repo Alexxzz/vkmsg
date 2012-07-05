@@ -17,6 +17,8 @@
 
 #define kDefImpMax 5
 
+#define kTableHeight 375.f
+
 @interface VKContactsVC()
 - (void)buildDataSurces;
 @end
@@ -50,11 +52,66 @@
     [_contactsAddressBook release];
     [_indexLettersAddressBook release];
     
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
     [super dealloc];
 }
 
-#pragma mark - View lifecycle
+/*
+#pragma mark - Notifications
+- (void)onKeyboardWillShow:(NSNotification*)notif
+{
+    
+    NSDictionary* userInfo = [notif userInfo];
+    NSValue* valRect = [userInfo valueForKey:UIKeyboardFrameEndUserInfoKey];
+    CGRect keybFrame = CGRectZero;
+    [valRect getValue:&keybFrame];
+    
+    NSNumber* animationDuration = [userInfo valueForKey:UIKeyboardAnimationDurationUserInfoKey]; 
+    
+    __block CGRect tableRect = _tableView.frame;
+    tableRect.origin.y = tableRect.origin.y - keybFrame.size.height;
+    
+    [UIView animateWithDuration:[animationDuration doubleValue] 
+                     animations:^{
+                         _tableView.frame = tableRect; 
+                     }
+                     completion:^(BOOL finished) {
+                         tableRect.origin.y = 0;
+                         tableRect.size.height = (tableRect.size.height - keybFrame.size.height) + 30;
+                         _tableView.frame = tableRect;      
+                         
+                         [_tableView setContentOffset:CGPointMake(0, _tableView.contentSize.height - _tableView.bounds.size.height) 
+                                             animated:NO];
+                     }];
+}
+- (void)onKeyboardWillHide:(NSNotification*)notif
+{
+    NSDictionary* userInfo = [notif userInfo];
+    NSValue* valRect = [userInfo valueForKey:UIKeyboardFrameEndUserInfoKey];
+    CGRect keybFrame = CGRectZero;
+    [valRect getValue:&keybFrame];
+    
+    NSNumber* animationDuration = [userInfo valueForKey:UIKeyboardAnimationDurationUserInfoKey];
+    
+    __block CGRect tableRect = [_tableView frame];
+    tableRect.origin.y = tableRect.size.height - kTableHeight;
+    tableRect.size.height = kTableHeight;   
+    _tableView.frame = tableRect;
+    
+    [UIView animateWithDuration:[animationDuration doubleValue] 
+                     animations:^{
+                         tableRect.origin.y = 0.f;
+                         _tableView.frame = tableRect;
+                     }
+                     completion:^(BOOL finished) {
+                         [_tableView setContentOffset:CGPointMake(0, _tableView.contentSize.height - _tableView.bounds.size.height) 
+                                             animated:YES];
+                     }];
+}
+ */
 
+#pragma mark - View lifecycle
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -87,6 +144,17 @@
                       } failure:^(NSError *error, NSDictionary *errDict) {
                           
                       }];
+    
+    /*
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+                                             selector:@selector(onKeyboardWillShow:) 
+                                                 name:UIKeyboardWillShowNotification 
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+                                             selector:@selector(onKeyboardWillHide:) 
+                                                 name:UIKeyboardWillHideNotification 
+                                               object:nil];
+     */
 }
 
 - (void)viewDidUnload
@@ -94,6 +162,8 @@
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -114,6 +184,11 @@
 }
 
 #pragma mark - Actions
+- (void)hideSegmentedCtrl:(BOOL)hide
+{
+    self.navigationItem.titleView = (hide ? nil : _segController);
+}
+
 - (IBAction)onSegmentedController:(id)sender
 {
     UISegmentedControl* segmentedCtrl = sender;
@@ -273,10 +348,100 @@
     NSLog(@"<--------buildDataSurces finish------------>");
 }
 
+#pragma mark - Search table
+- (NSArray*)searchResultTitleSectionIndexTitles
+{
+    return nil;
+}
+
+- (NSString*)searchResulttitleForHeaderInSection:(NSInteger)section
+{
+    NSString* title = nil;
+    
+    return title;
+}
+
+- (NSInteger)searchResultNumberSections
+{
+    return 1;
+}
+
+- (NSInteger)searchResultNumberOfRowsInSection:(NSInteger)section
+{
+    return [_searchDataSource count];
+}
+
+- (UITableViewCell*)searchResultCellForIndexPath:(NSIndexPath*)indexPath
+{
+    UITableView* searchTable = self.searchDisplayController.searchResultsTableView;
+    
+    if (_viewType == eVKContactsViewType_friends)
+    {
+        NSString* cellId = [VKContactCell reuseId];
+        
+        VKContactCell* cell = [searchTable dequeueReusableCellWithIdentifier:cellId];
+        if (cell == nil)
+            cell = [VKContactCell contactCell];
+        
+        VKUser* friend = [_searchDataSource objectAtIndex:indexPath.row];
+        [cell configWithUser:friend];
+        
+        return cell;
+    }
+    else
+    {
+        NSString* cellId = @"contactCell";
+        
+        UITableViewCell* cell = [searchTable dequeueReusableCellWithIdentifier:cellId];
+        if (cell == nil)
+            cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle 
+                                           reuseIdentifier:cellId] autorelease];
+        
+        VKAddressBookPerson* person = [_searchDataSource objectAtIndex:indexPath.row];
+        
+        NSString* name = [person getName];
+        NSString* fullName = [person getFullName];
+        cell.textLabel.text = name;
+        cell.detailTextLabel.text = (name != fullName ? fullName : nil);
+        
+        return cell;
+    }
+    
+    return nil;
+}
+
+- (void)searchResultDidSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (_viewType == eVKContactsViewType_contacts)
+    {
+        VKAddressBookPerson* person = [_searchDataSource objectAtIndex:indexPath.row];
+        
+        VKContactInfoVC* infoVC = [VKContactInfoVC new];
+        infoVC.abPerson = person;
+        infoVC.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:infoVC 
+                                             animated:YES];
+        [infoVC release];
+    }
+    else
+    {
+        VKUser* friend = [_searchDataSource objectAtIndex:indexPath.row];
+        
+        VKDialogVC* dialog = [VKDialogVC new];
+        dialog.uid = friend.uid;    
+        dialog.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:dialog animated:YES];
+        [dialog release];
+    }
+}
+
 #pragma mark - TableView
 // return list of section titles to display in section index view (e.g. "ABCD...Z#")
 - (NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView
 {    
+    if (tableView != _tableView)
+        return [self searchResultTitleSectionIndexTitles];
+    
     switch (_viewType) 
     {
         case eVKContactsViewType_friends:
@@ -294,6 +459,9 @@
 
 - (NSString*)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
+    if (tableView != _tableView)
+        return [self searchResulttitleForHeaderInSection:section];
+    
     NSString* title = nil;
     
     switch (_viewType) 
@@ -341,6 +509,9 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
+    if (tableView != _tableView)
+        return [self searchResultNumberSections];
+    
     NSInteger res = 0;
     switch (_viewType) 
     {
@@ -361,6 +532,10 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {    
+    if (tableView != _tableView)
+        return [self searchResultNumberOfRowsInSection:section];
+        
+    
     switch (_viewType) 
     {
         //Contacts
@@ -393,7 +568,10 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{    
+{ 
+    if (tableView != _tableView)
+        return [self searchResultCellForIndexPath:indexPath];
+    
     switch (_viewType) 
     {
         //Contacts
@@ -453,7 +631,13 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    [_tableView deselectRowAtIndexPath:indexPath animated:YES];
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+    if (tableView != _tableView)
+    {
+        [self searchResultDidSelectRowAtIndexPath:indexPath];
+        return;
+    }
     
     switch (_viewType) 
     {
@@ -498,6 +682,54 @@
             break;
         }
     }
+}
+
+#pragma mark - Searching
+- (void)searchForString:(NSString*)str
+{
+    [_searchDataSource release], _searchDataSource = nil;
+    _searchDataSource = [NSMutableArray new];
+    
+    if (_viewType == eVKContactsViewType_friends)
+    {
+        for (NSArray* section in [_contacts objectEnumerator])
+        {            
+            //Skip search in important section
+            if ([section isEqual:[_contacts valueForKey:kStrImportant]])
+                continue;
+            
+            for (VKUser* usr in section)
+            {
+                NSString* fullName = [NSString stringWithFormat:@"%@ %@", usr.first_name, usr.last_name];
+                NSRange nameRange = [fullName rangeOfString:str
+                                                    options:NSCaseInsensitiveSearch];
+                if (nameRange.location != NSNotFound)
+                    [_searchDataSource addObject:usr];
+            }
+        }
+    }
+    else if (_viewType == eVKContactsViewType_contacts)
+    {
+        for (NSArray* section in [_contactsAddressBook objectEnumerator])
+        {
+            for (VKAddressBookPerson* person in section)
+            {
+                NSString* fullName = [person getFullName];
+                NSRange nameRange = [fullName rangeOfString:str
+                                                    options:NSCaseInsensitiveSearch];
+                if (nameRange.location != NSNotFound)
+                    [_searchDataSource addObject:person];
+            }
+        }
+    }
+}
+
+#pragma mark - Search Controller delegate
+- (BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchString:(NSString *)searchString
+{
+    [self searchForString:searchString];
+    
+    return YES;
 }
 
 @end

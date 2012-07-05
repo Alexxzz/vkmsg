@@ -12,6 +12,7 @@
 #import "VKMessage.h"
 #import "VKDialogVC.h"
 #import "VKLongPollServerController.h"
+#import "VKContactsVC.h"
 
 @implementation VKMessagesVC
 
@@ -93,6 +94,9 @@
     UIButton* btn = [UIButton buttonWithType:UIButtonTypeCustom];
     [btn setImage:[UIImage imageNamed:@"new_msg.png"] forState:UIControlStateNormal];
     [btn sizeToFit];
+    [btn addTarget:self 
+            action:@selector(onNewDialog:) 
+  forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem* bbi = [[UIBarButtonItem alloc] initWithCustomView:btn];
     self.navigationItem.rightBarButtonItem = bbi;
     [bbi release];
@@ -139,7 +143,13 @@
 #pragma mark - IBActions
 - (void)onNewDialog:(id)sender
 {
-    
+    VKContactsVC* contactsVC = [VKContactsVC new];
+    [contactsVC view];    
+    [contactsVC hideSegmentedCtrl:YES];
+    [contactsVC.navigationItem setTitle:kStrContacts];
+    contactsVC.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:contactsVC animated:YES];
+    [contactsVC release];
 }
 
 #pragma mark - Scroll delegate

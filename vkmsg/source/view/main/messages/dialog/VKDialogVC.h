@@ -11,7 +11,7 @@
 #import "VKCapchaVC.h"
 #import "VKLocationManager.h"
 
-@interface VKDialogVC : UIViewController<UITableViewDelegate, UITableViewDataSource, UITextViewDelegate, VKCapchaVCDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>
+@interface VKDialogVC : UIViewController<UITableViewDelegate, UITableViewDataSource, /*UITextViewDelegate,*/ VKCapchaVCDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate>
 {
     IBOutlet UITableView* _tableView;
     
@@ -19,7 +19,8 @@
     IBOutlet UIButton* _sendButton;
     IBOutlet UIButton* _attachmentButton;
     IBOutlet UIImageView* _inputBackImgView;
-    IBOutlet UITextView* _inputTextView;
+    //IBOutlet UITextView* _inputTextView;
+    IBOutlet UITextField* _inputTextView;
     IBOutlet UIView* _typingFooter;
     IBOutlet UIImageView* _inputBackgroundImgView;
     

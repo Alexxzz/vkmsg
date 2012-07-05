@@ -19,6 +19,7 @@
 #import "NIPhotoScrollView.h"
 
 #define kTableHeight 375.f
+#define kTypingTime 6
 
 @interface VKDialogVC()
 - (void)scrollToLastMessageAnimated:(BOOL)animated;
@@ -910,7 +911,8 @@
 }
 
 #pragma mark - UITextViewDelegate
-- (BOOL)textViewShouldBeginEditing:(UITextView *)textView
+//- (BOOL)textViewShouldBeginEditing:(UITextView *)textView
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textView
 {
     if ([textView.text isEqualToString:kStrWriteMessage])
     {
@@ -923,7 +925,8 @@
     return YES;
 }
 
-- (BOOL)textViewShouldEndEditing:(UITextView *)textView
+//- (BOOL)textViewShouldEndEditing:(UITextView *)textView
+- (BOOL)textFieldShouldEndEditing:(UITextField *)textView
 {
     if (textView.text == nil || [textView.text length] == 0)
     {
@@ -936,10 +939,11 @@
     return YES;
 }
 
-- (void)textViewDidChange:(UITextView *)textView
+//- (void)textViewDidChange:(UITextView *)textView
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
 {
     NSTimeInterval timeElapsed = [[NSDate date] timeIntervalSinceDate:_lastTypingSentDate];
-    if (timeElapsed > 6)
+    if (timeElapsed > kTypingTime)
     {
         [_lastTypingSentDate release];
         _lastTypingSentDate = [[NSDate date] retain];
@@ -950,6 +954,8 @@
                                                  
                                              }];
     }
+    
+    return YES;
 }
 
 #pragma mark - VKCapchaVCDelegate

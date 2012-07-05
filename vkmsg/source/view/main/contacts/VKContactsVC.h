@@ -16,7 +16,7 @@ typedef enum
     eVKContactsViewType_requests,
 } eVKContactsViewType;
 
-@interface VKContactsVC : UIViewController<UITableViewDataSource, UITableViewDelegate>
+@interface VKContactsVC : UIViewController<UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, UISearchDisplayDelegate>
 {
     IBOutlet UITableView* _tableView;
     IBOutlet UISearchBar* _searchBar;
@@ -30,8 +30,12 @@ typedef enum
     NSArray* _indexLettersAddressBook;
     NSMutableDictionary* _contactsAddressBook;
     
+    NSMutableArray* _searchDataSource;
+    
     eVKContactsViewType _viewType;
 }
+
+- (void)hideSegmentedCtrl:(BOOL)hide;
 
 - (IBAction)onSegmentedController:(id)sender;
 
