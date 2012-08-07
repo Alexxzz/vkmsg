@@ -15,8 +15,8 @@
 #define kApiUrl @"https://api.vk.com/method/"
 
 #define kDirectLoginUrl @"https://api.vk.com/"
-#define kAppId @"2855155"
-#define kAppSecret @"5448ab16da2dd786edf"
+#define kAppId @""
+#define kAppSecret @""
 #define kAttachmentUploadPath @"upload.php"
 
 @implementation VKApi
