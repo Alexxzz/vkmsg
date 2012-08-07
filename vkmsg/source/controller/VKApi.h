@@ -31,6 +31,14 @@ typedef enum
 + (void)setOnlineSuccess:(void(^)())success
                  failure:(void(^)(NSError* error, NSDictionary* errDict))failure;
 
+//Notifications
++ (void)registerDeviceWithPushToken:(NSString*)token
+                        deviceModel:(NSString*)model
+                      systemVersion:(NSString*)sysVer
+                             noText:(BOOL)noText
+                            success:(void(^)())success
+                            failure:(void(^)(NSError* error, NSDictionary* errDict))failure;
+
 //Getting friends
 + (void)getFriendsListCount:(NSUInteger)count 
                      offset:(NSUInteger)offset
@@ -57,6 +65,23 @@ typedef enum
                    Success:(void(^)(NSArray* friends))success
                    failure:(void(^)(NSError* error, NSDictionary* errDict))failure;
 
+//Add/delete friends, get requests
++ (void)addFriendWithId:(NSNumber*)Id
+               withText:(NSString*)text
+                success:(void(^)())success
+                failure:(void(^)(NSError* error, NSDictionary* errDict))failure;
+
++ (void)deleteFriendWithId:(NSNumber*)Id
+                   success:(void(^)())success
+                   failure:(void(^)(NSError* error, NSDictionary* errDict))failure;
+
++ (void)getFriendsRequestsWithOffset:(NSUInteger)offset
+                               count:(NSUInteger)count
+                        loadMessages:(BOOL)loadMsgs
+                loadOutgoingRequests:(BOOL)outgoing
+                             success:(void(^)(NSArray* respons))success
+                             failure:(void(^)(NSError* error, NSDictionary* errDict))failure;
+                            
 //Messages
 + (void)getDialogsListCount:(NSUInteger)count
                      offset:(NSUInteger)offset

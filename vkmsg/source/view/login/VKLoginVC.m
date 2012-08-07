@@ -58,6 +58,7 @@
              withPassword:_passwordTextField.text
      success:^{
          dispatch_async(dispatch_get_main_queue(), ^{             
+             [AppDel regDeviceAtApi];             
              [AppDel showMainUI];
          });
      } failure:^(NSError *error, NSString* errorDesc) {

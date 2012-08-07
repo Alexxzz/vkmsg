@@ -36,6 +36,7 @@
 #pragma mark - UIApplicationDelegate
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    //Init AB
     [VKAddressBook addressBook];
     
     NSURLCache *URLCache = [[NSURLCache alloc] initWithMemoryCapacity:1024 * 1024 
@@ -50,6 +51,10 @@
         [self showSignIn];
     else
         [self showMainUI];
+    
+    //Push
+    [application registerForRemoteNotificationTypes:UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound];
+    application.applicationIconBadgeNumber = 0;
     
     return YES;
 }
@@ -75,6 +80,8 @@
     /*
      Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
      */
+    
+    application.applicationIconBadgeNumber = 0;
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
@@ -106,6 +113,50 @@
 {
 }
 */
+
+#pragma mark - Push
+- (void)regDeviceAtApi
+{
+    if (Storage.pushToken == nil || [Storage.pushToken length] == 0)
+        return;
+    
+    [VKApi registerDeviceWithPushToken:Storage.pushToken 
+                           deviceModel:[VKHelper deviceModel] 
+                         systemVersion:[VKHelper systemVersion]
+                                noText:NO 
+                               success:^{
+                                   
+                               } 
+                               failure:^(NSError *error, NSDictionary *errDict) {
+                                   
+                               }];
+}
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
+{
+    NSLog(@"didReceiveRemoteNotification userInfo: %@", userInfo);
+}
+
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
+{
+    NSLog(@"didRegisterForRemoteNotificationsWithDeviceToken deviceToken: %@", deviceToken);
+    
+    NSString* tokenStr = [[deviceToken description] stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"<>"]];
+    tokenStr = [tokenStr stringByReplacingOccurrencesOfString:@" " withString:@""];
+    NSLog(@"tokenStr: %@", tokenStr);
+    
+    Storage.pushToken = tokenStr;
+    if (Storage.appToken != nil && Storage.user != nil)
+        [self regDeviceAtApi];
+}
+
+- (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error
+{
+    NSLog(@"didFailToRegisterForRemoteNotificationsWithError error: %@", error);
+    
+    [VKHelper deviceModel];
+    [VKHelper systemVersion];
+}
 
 #pragma mark - UI
 - (void)showSignIn

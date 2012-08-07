@@ -24,4 +24,6 @@
 - (void)showWaitingView;
 - (void)hideWaitingView;
 
+- (void)regDeviceAtApi;
+
 @end

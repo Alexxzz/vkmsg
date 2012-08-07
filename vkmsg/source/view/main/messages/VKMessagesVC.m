@@ -13,6 +13,7 @@
 #import "VKDialogVC.h"
 #import "VKLongPollServerController.h"
 #import "VKContactsVC.h"
+#import "VKContactCell.h"
 
 @implementation VKMessagesVC
 
@@ -31,6 +32,13 @@
     [super didReceiveMemoryWarning];
     
     // Release any cached data, images, etc that aren't in use.
+}
+
+- (void)dealloc
+{
+    [_searchDataSource release], _searchDataSource = nil;
+    
+    [super dealloc];
 }
 
 #pragma mark - Long Poll Updates
@@ -155,7 +163,9 @@
 #pragma mark - Scroll delegate
 - (void)scrollViewDidScroll:(UIScrollView *)aScrollView 
 {
-    if (_isLoadingMore == YES || Storage.dialogsCount >= Storage.dialogsTotalCount)
+    if (_isLoadingMore == YES || 
+        Storage.dialogsCount >= Storage.dialogsTotalCount || 
+        _searchDataSource != nil)
         return;
     
     CGPoint offset = aScrollView.contentOffset;
@@ -219,34 +229,94 @@
 #pragma mark - UITableView delegate/datasource
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [Storage.dialogList count];
+    if (_searchDataSource != nil)
+        return [_searchDataSource count];
+    else
+        return [Storage.dialogList count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSString* cellId = [VKMessagesListCell reuseId];
+    if (_searchDataSource != nil)
+    {
+        NSString* cellId = [VKContactCell reuseId];
+        
+        VKContactCell* cell = [tableView dequeueReusableCellWithIdentifier:cellId];
+        if (cell == nil)
+            cell = [VKContactCell contactCell];
+        
+        VKUser* friend = [_searchDataSource objectAtIndex:indexPath.row];
+        [cell configWithUser:friend];
+        
+        return cell;
+    }
+    else
+    {
+        NSString* cellId = [VKMessagesListCell reuseId];
+        
+        VKMessagesListCell* cell = [_tableView dequeueReusableCellWithIdentifier:cellId];
+        if (cell == nil)
+            cell = [VKMessagesListCell messagesCell];
+        
+        VKMessage* msg = msg = [Storage.dialogList objectAtIndex:indexPath.row];
+        [cell configWithMessage:msg];      
+        
+        return cell;
+    }
     
-    VKMessagesListCell* cell = [_tableView dequeueReusableCellWithIdentifier:cellId];
-    if (cell == nil)
-        cell = [VKMessagesListCell messagesCell];
-    
-    VKMessage* msg = [Storage.dialogList objectAtIndex:indexPath.row];
-    [cell configWithMessage:msg];
-    
-    return cell;
+    return nil;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [_tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-    VKMessage* msg = [Storage.dialogList objectAtIndex:indexPath.row];
+    VKMessage* msg = nil;
+    if (_searchDataSource != nil)
+        msg = [_searchDataSource objectAtIndex:indexPath.row];
+    else
+        msg = [Storage.dialogList objectAtIndex:indexPath.row];
     
     VKDialogVC* dialog = [VKDialogVC new];
     dialog.uid = msg.uid;
     dialog.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:dialog animated:YES];
     [dialog release];
+}
+
+#pragma mark - Searching
+- (void)searchForString:(NSString*)str
+{
+    [_searchDataSource release], _searchDataSource = nil;
+    _searchDataSource = [NSMutableArray new];
+    
+    for (VKMessage* msg in Storage.dialogList)
+    {
+        VKUser* user = [Storage userWithId:msg.uid];
+        if (user != nil)
+        {
+            NSString* fullName = [NSString stringWithFormat:@"%@ %@", user.first_name, user.last_name];
+            NSRange nameRange = [fullName rangeOfString:str
+                                                options:NSCaseInsensitiveSearch];
+            if (nameRange.location != NSNotFound)
+                [_searchDataSource addObject:user];
+        }
+    }
+}
+
+#pragma mark - Search Controller delegate
+- (BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchString:(NSString *)searchString
+{
+    [self searchForString:searchString];
+    
+    return YES;
+}
+
+- (void)searchDisplayController:(UISearchDisplayController *)controller willUnloadSearchResultsTableView:(UITableView *)tableView
+{
+    [_searchDataSource release], _searchDataSource = nil;
+    
+    [_tableView reloadData];
 }
 
 @end

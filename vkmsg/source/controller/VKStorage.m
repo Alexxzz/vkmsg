@@ -8,6 +8,7 @@
 
 #import "VKStorage.h"
 #import "VKDialogContainer.h"
+#import "VKHelper.h"
 
 #define kAppTokenKey @"appToken"
 
@@ -17,7 +18,23 @@
 
 @implementation VKStorage
 
-@synthesize user, friends, dialogList, dialogs, favourites, friendsCount, friendsTotalCount, dialogsCount, dialogsTotalCount;
+@synthesize user,
+favourites, 
+
+friends,
+friendsCount, 
+friendsTotalCount, 
+
+dialogList,
+
+dialogs,
+dialogsCount, 
+dialogsTotalCount, 
+
+pushToken,
+
+requests,
+requestsCount;
 
 #pragma mark - singeltone methods
 static VKStorage* storageInstance = nil;
@@ -56,10 +73,11 @@ static VKStorage* storageInstance = nil;
 - (id)init
 {
     self = [super init];
-    if (self)
+    if (self != nil)
     {
         [self restore];
     }
+    
     return self;
 }
 - (void)dealloc
@@ -69,6 +87,8 @@ static VKStorage* storageInstance = nil;
     self.dialogList = nil;
     self.dialogs = nil;
     self.favourites = nil;
+    self.pushToken = nil;
+    self.requests = nil;
     
     [super dealloc];
 }
@@ -167,7 +187,6 @@ static VKStorage* storageInstance = nil;
         NSLog(@"user succsess == NO");
     
     //Favourites
-
 }
 
 - (void)restore

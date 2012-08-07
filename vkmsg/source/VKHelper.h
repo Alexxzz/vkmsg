@@ -11,6 +11,7 @@
 
 #define kInitialMsgCount 20
 #define kInitialDlgCount 20
+#define kInitialRequestsCount 20
 #define kInitialFriendsCount 100
 
 #import <UIKit/UIKit.h>
@@ -36,5 +37,8 @@ typedef enum
 + (NSString*)decodeFromPercentEscapeString:(NSString*)string;
 
 + (void)addGradient:(UIButton*)button;
+
++ (NSString*)deviceModel;
++ (NSString*)systemVersion;
 
 @end

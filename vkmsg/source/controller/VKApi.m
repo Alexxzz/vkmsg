@@ -120,6 +120,48 @@
                                                      }] start];
 }
 
+#pragma mark - Notifications
++ (void)registerDeviceWithPushToken:(NSString*)token
+                        deviceModel:(NSString*)model
+                      systemVersion:(NSString*)sysVer
+                             noText:(BOOL)noText
+                            success:(void(^)())success
+                            failure:(void(^)(NSError* error, NSDictionary* errDict))failure
+{
+    AFHTTPClient* httpClient = [AFHTTPClient clientWithBaseURL:[NSURL URLWithString:kApiUrl]];
+    NSMutableURLRequest* req = [httpClient requestWithMethod:@"GET" 
+                                                        path:@"account.registerDevice" 
+                                                  parameters:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                              Storage.appToken, @"access_token",
+                                                              Storage.user.uid, @"uid",
+                                                              token, @"token",
+                                                              nil]];
+    NSLog(@"registerDevice: %@", req.URL);
+    
+    [[AFJSONRequestOperation JSONRequestOperationWithRequest:req 
+                                                     success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+                                                         NSLog(@"JSON: %@", JSON);
+                                                         
+                                                         NSDictionary* resp = [JSON valueForKey:@"response"];
+                                                         if (resp != nil)
+                                                         {                                                             
+                                                             if (success != nil)
+                                                                 success();
+                                                         }
+                                                         else
+                                                         {
+                                                             NSDictionary* error = [JSON valueForKey:@"error"];
+                                                             if (error != nil && failure != nil)
+                                                                 failure(nil, error);
+                                                         }
+                                                     } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+                                                         NSLog(@"error: %@\r\nJSON:%@", error, JSON);
+                                                         
+                                                         if (failure != nil)
+                                                             failure(error, JSON);
+                                                     }] start];
+}
+
 #pragma mark - Friends list
 + (void)getFriendsListCount:(NSUInteger)count 
                      offset:(NSUInteger)offset
@@ -377,6 +419,131 @@
                                                              
                                                              if (success != nil)
                                                                  success([[friends copy] autorelease]);                                                              
+                                                         }
+                                                         else
+                                                         {
+                                                             NSDictionary* error = [JSON valueForKey:@"error"];
+                                                             if (error != nil && failure != nil)
+                                                                 failure(nil, error);
+                                                         }
+                                                     } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+                                                         NSLog(@"error: %@\r\nJSON:%@", error, JSON);
+                                                         
+                                                         if (failure != nil)
+                                                             failure(error, JSON);
+                                                     }] start];
+}
+
+#pragma mark - Add/delete friends, get requests
++ (void)addFriendWithId:(NSNumber*)uid
+               withText:(NSString*)text
+                success:(void(^)())success
+                failure:(void(^)(NSError* error, NSDictionary* errDict))failure
+{
+    AFHTTPClient* httpClient = [AFHTTPClient clientWithBaseURL:[NSURL URLWithString:kApiUrl]];
+    NSMutableURLRequest* req = [httpClient requestWithMethod:@"GET" 
+                                                        path:@"friends.add" 
+                                                  parameters:[NSDictionary dictionaryWithObjectsAndKeys:                                                              
+                                                              Storage.appToken, @"access_token",
+                                                              uid, @"uid",
+                                                              (text != nil ? text : @""), @"text",
+                                                              nil]];
+    NSLog(@"friends.add: %@", req.URL);
+    
+    [[AFJSONRequestOperation JSONRequestOperationWithRequest:req 
+                                                     success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+                                                         NSLog(@"JSON: %@", JSON);
+                                                         
+                                                         NSDictionary* resp = [JSON valueForKey:@"response"];
+                                                         if (resp != nil)
+                                                         {                                                             
+                                                             if (success != nil)
+                                                                 success();
+                                                         }
+                                                         else
+                                                         {
+                                                             NSDictionary* error = [JSON valueForKey:@"error"];
+                                                             if (error != nil && failure != nil)
+                                                                 failure(nil, error);
+                                                         }
+                                                     } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+                                                         NSLog(@"error: %@\r\nJSON:%@", error, JSON);
+                                                         
+                                                         if (failure != nil)
+                                                             failure(error, JSON);
+                                                     }] start];
+}
+
++ (void)deleteFriendWithId:(NSNumber*)uid
+                   success:(void(^)())success
+                   failure:(void(^)(NSError* error, NSDictionary* errDict))failure
+{
+    AFHTTPClient* httpClient = [AFHTTPClient clientWithBaseURL:[NSURL URLWithString:kApiUrl]];
+    NSMutableURLRequest* req = [httpClient requestWithMethod:@"GET" 
+                                                        path:@"friends.delete" 
+                                                  parameters:[NSDictionary dictionaryWithObjectsAndKeys:                                                              
+                                                              Storage.appToken, @"access_token",
+                                                              uid, @"uid",
+                                                              nil]];
+    NSLog(@"friends.delete: %@", req.URL);
+    
+    [[AFJSONRequestOperation JSONRequestOperationWithRequest:req 
+                                                     success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+                                                         NSLog(@"JSON: %@", JSON);
+                                                         
+                                                         NSDictionary* resp = [JSON valueForKey:@"response"];
+                                                         if (resp != nil)
+                                                         {                                                             
+                                                             if (success != nil)
+                                                                 success();
+                                                         }
+                                                         else
+                                                         {
+                                                             NSDictionary* error = [JSON valueForKey:@"error"];
+                                                             if (error != nil && failure != nil)
+                                                                 failure(nil, error);
+                                                         }
+                                                     } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+                                                         NSLog(@"error: %@\r\nJSON:%@", error, JSON);
+                                                         
+                                                         if (failure != nil)
+                                                             failure(error, JSON);
+                                                     }] start];
+}
+
++ (void)getFriendsRequestsWithOffset:(NSUInteger)offset
+                               count:(NSUInteger)count
+                        loadMessages:(BOOL)loadMsgs
+                loadOutgoingRequests:(BOOL)outgoing
+                             success:(void(^)(NSArray* respons))success
+                             failure:(void(^)(NSError* error, NSDictionary* errDict))failure
+{
+    NSString* offsetStr = [[NSNumber numberWithInt:offset] stringValue];
+    NSString* countStr = [[NSNumber numberWithInt:count] stringValue];
+    NSString* loadMsgsStr = [[NSNumber numberWithBool:loadMsgs] stringValue];
+    NSString* outOstr = [[NSNumber numberWithBool:outgoing] stringValue];
+    
+    AFHTTPClient* httpClient = [AFHTTPClient clientWithBaseURL:[NSURL URLWithString:kApiUrl]];
+    NSMutableURLRequest* req = [httpClient requestWithMethod:@"GET" 
+                                                        path:@"friends.getRequests" 
+                                                  parameters:[NSDictionary dictionaryWithObjectsAndKeys:                                                              
+                                                              Storage.appToken, @"access_token",
+                                                              offsetStr, @"offset",
+                                                              countStr, @"count",
+                                                              loadMsgsStr, @"need_messages",
+                                                              outOstr, @"out",
+                                                              nil]];
+    NSLog(@"friends.getRequests: %@", req.URL);
+    
+    [[AFJSONRequestOperation JSONRequestOperationWithRequest:req 
+                                                     success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+                                                         NSLog(@"JSON: %@", JSON);
+                                                         
+                                                         NSArray* resp = [JSON valueForKey:@"response"];
+                                                         if (resp != nil)
+                                                         {                                                             
+                                                             if (success != nil)
+                                                                 success(resp);
                                                          }
                                                          else
                                                          {

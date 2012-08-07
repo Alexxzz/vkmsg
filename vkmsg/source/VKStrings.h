@@ -29,6 +29,9 @@
 #define kStrOnline @"online"
 #define kStrContacts @"Contacts"
 #define kStrImportant @"Important"
+#define kStrFriendRequests @"Friend Requests"
+#define kStrSuggestions @"Suggestions"
+#define kStrInviteFriends @"Invite Friends"
 
 #define kStrSendMessage @"Send message"
 #define kStrSendInvite @"Send invite"

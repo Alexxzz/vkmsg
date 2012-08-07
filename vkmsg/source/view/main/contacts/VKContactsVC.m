@@ -7,20 +7,25 @@
 //
 
 #import "VKContactsVC.h"
-#import "VKContactCell.h"
-#import "VKStorage.h"
 #import "VKApi.h"
-#import "VKStrings.h"
 #import "VKDialogVC.h"
 #import "VKAddressBook.h"
 #import "VKContactInfoVC.h"
+#import "VKHelper.h"
+#import "VKStorage.h"
+#import "VKStrings.h"
 
 #define kDefImpMax 5
 
 #define kTableHeight 375.f
 
+#define kContactsCellHeight 44.f
+#define kRequestCellHeight 47.f
+#define kRequestSectionsCount 3
+
 @interface VKContactsVC()
 - (void)buildDataSurces;
+- (void)getRequests;
 @end
 
 @implementation VKContactsVC
@@ -57,60 +62,6 @@
     [super dealloc];
 }
 
-/*
-#pragma mark - Notifications
-- (void)onKeyboardWillShow:(NSNotification*)notif
-{
-    
-    NSDictionary* userInfo = [notif userInfo];
-    NSValue* valRect = [userInfo valueForKey:UIKeyboardFrameEndUserInfoKey];
-    CGRect keybFrame = CGRectZero;
-    [valRect getValue:&keybFrame];
-    
-    NSNumber* animationDuration = [userInfo valueForKey:UIKeyboardAnimationDurationUserInfoKey]; 
-    
-    __block CGRect tableRect = _tableView.frame;
-    tableRect.origin.y = tableRect.origin.y - keybFrame.size.height;
-    
-    [UIView animateWithDuration:[animationDuration doubleValue] 
-                     animations:^{
-                         _tableView.frame = tableRect; 
-                     }
-                     completion:^(BOOL finished) {
-                         tableRect.origin.y = 0;
-                         tableRect.size.height = (tableRect.size.height - keybFrame.size.height) + 30;
-                         _tableView.frame = tableRect;      
-                         
-                         [_tableView setContentOffset:CGPointMake(0, _tableView.contentSize.height - _tableView.bounds.size.height) 
-                                             animated:NO];
-                     }];
-}
-- (void)onKeyboardWillHide:(NSNotification*)notif
-{
-    NSDictionary* userInfo = [notif userInfo];
-    NSValue* valRect = [userInfo valueForKey:UIKeyboardFrameEndUserInfoKey];
-    CGRect keybFrame = CGRectZero;
-    [valRect getValue:&keybFrame];
-    
-    NSNumber* animationDuration = [userInfo valueForKey:UIKeyboardAnimationDurationUserInfoKey];
-    
-    __block CGRect tableRect = [_tableView frame];
-    tableRect.origin.y = tableRect.size.height - kTableHeight;
-    tableRect.size.height = kTableHeight;   
-    _tableView.frame = tableRect;
-    
-    [UIView animateWithDuration:[animationDuration doubleValue] 
-                     animations:^{
-                         tableRect.origin.y = 0.f;
-                         _tableView.frame = tableRect;
-                     }
-                     completion:^(BOOL finished) {
-                         [_tableView setContentOffset:CGPointMake(0, _tableView.contentSize.height - _tableView.bounds.size.height) 
-                                             animated:YES];
-                     }];
-}
- */
-
 #pragma mark - View lifecycle
 - (void)viewDidLoad
 {
@@ -144,26 +95,11 @@
                       } failure:^(NSError *error, NSDictionary *errDict) {
                           
                       }];
-    
-    /*
-    [[NSNotificationCenter defaultCenter] addObserver:self 
-                                             selector:@selector(onKeyboardWillShow:) 
-                                                 name:UIKeyboardWillShowNotification 
-                                               object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self 
-                                             selector:@selector(onKeyboardWillHide:) 
-                                                 name:UIKeyboardWillHideNotification 
-                                               object:nil];
-     */
 }
 
 - (void)viewDidUnload
 {
     [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -211,6 +147,10 @@
         //Requests
         case eVKContactsViewType_requests:
             _tableView.tableHeaderView = nil;
+            
+            if (Storage.requests == nil)
+                [self getRequests];
+            
             break;
     }
     
@@ -348,6 +288,47 @@
     NSLog(@"<--------buildDataSurces finish------------>");
 }
 
+- (void)replaceUidsWithVKUsersInArray:(NSMutableArray*)array
+{
+    for (NSNumber* uid in array)
+    {
+        if ([uid isKindOfClass:[NSNumber class]])
+        {
+            VKUser* usr = [Storage userWithId:uid];
+            if (usr != nil)
+            {
+                
+            }
+        }
+    }
+}
+
+- (void)getRequests
+{
+    [VKApi getFriendsRequestsWithOffset:Storage.requestsCount 
+                                  count:kInitialRequestsCount 
+                           loadMessages:NO
+                   loadOutgoingRequests:NO 
+                                success:^(NSArray *response) {
+                                    if (response != nil && [response count] > 0)
+                                    {
+                                        [VKApi getFriendsWithIds:response 
+                                                         success:^(NSArray *friends) {                                                             
+                                                             Storage.requests = [NSMutableArray arrayWithArray:friends];
+                                                             Storage.requestsCount += [friends count];
+                                                             
+                                                             if (_tableView.superview != nil)
+                                                                 [_tableView reloadData];
+                                                         } failure:^(NSError *error, NSDictionary *errDict) {   
+                                                             
+                                                         }];
+                                    }
+                                } 
+                                failure:^(NSError *error, NSDictionary *errDict) {
+                                    
+                                }];
+}
+
 #pragma mark - Search table
 - (NSArray*)searchResultTitleSectionIndexTitles
 {
@@ -384,6 +365,7 @@
             cell = [VKContactCell contactCell];
         
         VKUser* friend = [_searchDataSource objectAtIndex:indexPath.row];
+        cell.type = eVKContactCellType_contact;
         [cell configWithUser:friend];
         
         return cell;
@@ -483,7 +465,24 @@
         }
             
         case eVKContactsViewType_requests:
+        {
+            switch (section) 
+            {
+                default:
+                case 0:
+                    title = nil;
+                    break;
+                    
+                case 1:
+                    title = kStrFriendRequests;
+                    break;
+                    
+                case 2:
+                    title = kStrSuggestions;
+                    break;
+            }
             break;
+        }
     }
         
     return title;
@@ -496,11 +495,15 @@
     {
         default:
         case eVKContactsViewType_contacts:
-            res = 44.f;
+            res = kContactsCellHeight;
             break;
             
         case eVKContactsViewType_friends:
             res = [VKContactCell height];
+            break;
+            
+        case eVKContactsViewType_requests:
+            res = kRequestCellHeight;
             break;
     }
     
@@ -521,6 +524,10 @@
             
         case eVKContactsViewType_contacts:
             res = [_indexLettersAddressBook count];
+            break;
+            
+        case eVKContactsViewType_requests:
+            res = kRequestSectionsCount;
             break;
             
         default:
@@ -563,7 +570,28 @@
         //Requests
         default:
         case eVKContactsViewType_requests:
-            return 0;
+        {
+            NSInteger count = 0;
+            
+            switch (section) 
+            {
+                case 0:
+                    count = 1;
+                    break;
+                    
+                case 1:
+                    count = [Storage.requests count];
+                    break;
+                    
+                case 2:
+                    break;
+                    
+                default:
+                    break;
+            }
+            
+            return count;
+        }
     }
 }
 
@@ -614,6 +642,7 @@
             NSArray* sectionArray = [_contacts valueForKey:key];
             
             VKUser* friend = [sectionArray objectAtIndex:indexPath.row];
+            cell.type = eVKContactCellType_contact;
             [cell configWithUser:friend];
             
             return cell;
@@ -622,11 +651,57 @@
         //Requests
         case eVKContactsViewType_requests:
         {
-            break;
+            switch (indexPath.section) {
+                case 0:
+                {
+                    static NSString* invFriendsCellId = @"invFriendsCellId";
+                    UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:invFriendsCellId];
+                    if (cell == nil)
+                        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault 
+                                                      reuseIdentifier:invFriendsCellId] autorelease];
+                    
+                    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+                    cell.textLabel.text = kStrInviteFriends;
+                    
+                    return cell;
+                }
+                    
+                case 1:
+                {
+                    NSString* cellId = [VKContactCell reuseId];
+                    
+                    VKContactCell* cell = [tableView dequeueReusableCellWithIdentifier:cellId];
+                    if (cell == nil)
+                        cell = [VKContactCell contactCellWithType:eVKContactCellType_request];
+                    
+                    VKUser* friend = [Storage.requests objectAtIndex:indexPath.row];
+                    cell.type = eVKContactCellType_request;
+                    [cell configWithUser:friend];
+                    cell.delegate = self;
+                    
+                    return cell;
+                }
+                    
+                case 2:
+                {
+                    
+                }
+                    
+                default:
+                    break;
+            }
         }
     }
     
     return nil;
+}
+
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (_viewType == eVKContactsViewType_requests && indexPath.section == 1)
+        return UITableViewCellEditingStyleDelete;
+    
+    return UITableViewCellEditingStyleNone;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -684,6 +759,53 @@
     }
 }
 
+#pragma mark - VKContactCellDelegate
+- (void)requestForCell:(VKContactCell*)cell accepted:(BOOL)accepted
+{
+    NSIndexPath* indexPath = [_tableView indexPathForCell:cell];
+    VKUser* friend = [Storage.requests objectAtIndex:indexPath.row];
+    
+    if (accepted == YES)
+    {
+        [VKApi addFriendWithId:friend.uid 
+                      withText:nil 
+                       success:^{
+                           NSLog(@"Request with friend id: %@ accepted", friend.uid);                              
+                           dispatch_async(dispatch_get_main_queue(), ^{
+                               [Storage.requests removeObject:friend];
+                               [_tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] 
+                                                 withRowAnimation:UITableViewRowAnimationFade];
+                               
+                               [VKApi getFriendsListCount:kInitialFriendsCount 
+                                                   offset:0 
+                                                    order:eVKFriendsOrder_hints 
+                                                  success:^(NSArray *friends) {
+                                                      Storage.friends = friends;
+                                                  } failure:^(NSError *error, NSDictionary* errDict) {
+                                                      
+                                                  }];
+                           });
+                       } failure:^(NSError *error, NSDictionary *errDict) {
+                           
+                       }];
+    }
+    else 
+    {
+        [VKApi deleteFriendWithId:friend.uid 
+                          success:^{
+                              NSLog(@"Request with friend id: %@ denied", friend.uid);                              
+                              dispatch_async(dispatch_get_main_queue(), ^{
+                                  [Storage.requests removeObject:friend];
+                                  [_tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] 
+                                                    withRowAnimation:UITableViewRowAnimationFade];
+                              });
+                          } 
+                          failure:^(NSError *error, NSDictionary *errDict) {
+                              
+                          }];
+    }
+}
+
 #pragma mark - Searching
 - (void)searchForString:(NSString*)str
 {
@@ -730,6 +852,11 @@
     [self searchForString:searchString];
     
     return YES;
+}
+
+- (void)searchDisplayController:(UISearchDisplayController *)controller willUnloadSearchResultsTableView:(UITableView *)tableView
+{
+    [_searchDataSource release], _searchDataSource = nil;
 }
 
 @end

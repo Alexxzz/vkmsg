@@ -166,6 +166,9 @@
 		3F813773151957A300EDC431 /* VKMessagesVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3F813771151957A300EDC431 /* VKMessagesVC.xib */; };
 		3F81377615195E2900EDC431 /* VKMessagesListCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F81377515195E2800EDC431 /* VKMessagesListCell.m */; };
 		3F8137781519645D00EDC431 /* VKMessagesListCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3F8137771519645B00EDC431 /* VKMessagesListCell.xib */; };
+		3F9D64C815BCB7AE008BD8F7 /* addcontact.png in Resources */ = {isa = PBXBuildFile; fileRef = 3F9D64C515BCB7AE008BD8F7 /* addcontact.png */; };
+		3F9D64C915BCB7AE008BD8F7 /* addcontactpressed.png in Resources */ = {isa = PBXBuildFile; fileRef = 3F9D64C615BCB7AE008BD8F7 /* addcontactpressed.png */; };
+		3F9D64CA15BCB7AE008BD8F7 /* UIRemoveControlMinus.png in Resources */ = {isa = PBXBuildFile; fileRef = 3F9D64C715BCB7AE008BD8F7 /* UIRemoveControlMinus.png */; };
 		3FC49AB91576CA4B005CD23C /* VKMapVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FC49AB71576CA4B005CD23C /* VKMapVC.m */; };
 		3FC49ABA1576CA4B005CD23C /* VKMapVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3FC49AB81576CA4B005CD23C /* VKMapVC.xib */; };
 		3FC49ABD1576CD1E005CD23C /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FC49ABC1576CD1E005CD23C /* MapKit.framework */; };
@@ -201,6 +204,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3F012E7A15B63E94001C75C4 /* vkmsg.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = vkmsg.entitlements; sourceTree = "<group>"; };
 		3F26A2AC1525265C0060998C /* VKLongPollServerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VKLongPollServerController.h; sourceTree = "<group>"; };
 		3F26A2AD1525265C0060998C /* VKLongPollServerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VKLongPollServerController.m; sourceTree = "<group>"; };
 		3F53DDF7157ABFEB00F2EF86 /* NIBlocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NIBlocks.h; sourceTree = "<group>"; };
@@ -431,6 +435,9 @@
 		3F81377415195E2800EDC431 /* VKMessagesListCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VKMessagesListCell.h; sourceTree = "<group>"; };
 		3F81377515195E2800EDC431 /* VKMessagesListCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VKMessagesListCell.m; sourceTree = "<group>"; };
 		3F8137771519645B00EDC431 /* VKMessagesListCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VKMessagesListCell.xib; sourceTree = "<group>"; };
+		3F9D64C515BCB7AE008BD8F7 /* addcontact.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = addcontact.png; sourceTree = "<group>"; };
+		3F9D64C615BCB7AE008BD8F7 /* addcontactpressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = addcontactpressed.png; sourceTree = "<group>"; };
+		3F9D64C715BCB7AE008BD8F7 /* UIRemoveControlMinus.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = UIRemoveControlMinus.png; sourceTree = "<group>"; };
 		3FC49AB61576CA4B005CD23C /* VKMapVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VKMapVC.h; sourceTree = "<group>"; };
 		3FC49AB71576CA4B005CD23C /* VKMapVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VKMapVC.m; sourceTree = "<group>"; };
 		3FC49AB81576CA4B005CD23C /* VKMapVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VKMapVC.xib; sourceTree = "<group>"; };
@@ -702,6 +709,7 @@
 		3F7EBB4D151161170016D100 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				3F012E7A15B63E94001C75C4 /* vkmsg.entitlements */,
 				3F7EBB4E151161170016D100 /* vkmsg-Info.plist */,
 				3F7EBB4F151161170016D100 /* InfoPlist.strings */,
 				3F7EBB52151161170016D100 /* main.m */,
@@ -799,6 +807,9 @@
 		3F7EBB86151164180016D100 /* img */ = {
 			isa = PBXGroup;
 			children = (
+				3F9D64C515BCB7AE008BD8F7 /* addcontact.png */,
+				3F9D64C615BCB7AE008BD8F7 /* addcontactpressed.png */,
+				3F9D64C715BCB7AE008BD8F7 /* UIRemoveControlMinus.png */,
 				3FF62440155881A6006E629D /* play_button.png */,
 				3FF3AF72153B8DED0075A9AE /* black.png */,
 				3FF088841531F5E400E9F399 /* new_msg.png */,
@@ -1209,6 +1220,9 @@
 				3F53DE7F157ABFEB00F2EF86 /* deps in Resources */,
 				3F53DE82157ABFEB00F2EF86 /* deps in Resources */,
 				3F53DE83157ABFEB00F2EF86 /* NimbusPhotos.bundle in Resources */,
+				3F9D64C815BCB7AE008BD8F7 /* addcontact.png in Resources */,
+				3F9D64C915BCB7AE008BD8F7 /* addcontactpressed.png in Resources */,
+				3F9D64CA15BCB7AE008BD8F7 /* UIRemoveControlMinus.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1322,7 +1336,8 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				CODE_SIGN_ENTITLEMENTS = vkmsg/vkmsg.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer: Oleksandr Zagorskyy (XV3K43C638)";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1336,7 +1351,9 @@
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INSTALL_MODE_FLAG = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				PROVISIONING_PROFILE = "9E0AE2C6-69B0-4D9F-B6DB-B512894D87BC";
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -1346,15 +1363,18 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				CODE_SIGN_ENTITLEMENTS = vkmsg/vkmsg.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Oleksandr Zagorskyy";
 				COPY_PHASE_STRIP = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INSTALL_MODE_FLAG = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				PROVISIONING_PROFILE = "40763323-14A8-457C-B345-28F54BC2CDA8";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -1363,12 +1383,15 @@
 		3F7EBB6F151161170016D100 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Oleksandr Zagorskyy (XV3K43C638)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "vkmsg/vkmsg-Prefix.pch";
 				INFOPLIST_FILE = "vkmsg/vkmsg-Info.plist";
+				INSTALL_PATH = vkmsg/vkmsg.entitlements;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "74048863-9903-4589-87BC-FBF7D1FAA516";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1376,12 +1399,15 @@
 		3F7EBB70151161170016D100 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				CODE_SIGN_ENTITLEMENTS = vkmsg/vkmsg.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Oleksandr Zagorskyy";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "vkmsg/vkmsg-Prefix.pch";
 				INFOPLIST_FILE = "vkmsg/vkmsg-Info.plist";
+				INSTALL_PATH = vkmsg/vkmsg.entitlements;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "40763323-14A8-457C-B345-28F54BC2CDA8";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

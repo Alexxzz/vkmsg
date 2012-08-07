@@ -8,6 +8,7 @@
 
 #import "VKHelper.h"
 #import <QuartzCore/QuartzCore.h>
+#import <sys/utsname.h>
 
 @implementation VKHelper
 
@@ -187,6 +188,26 @@
                             [NSNumber numberWithFloat:1.0f],
                             nil];
     [layer addSublayer:shineLayer];
+}
+
+#pragma mark - Device info
++ (NSString*)deviceModel
+{
+    struct utsname systemInfo;
+    uname(&systemInfo);
+	
+    return [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
+}
++ (NSString*)systemVersion
+{
+    NSString* res = nil;
+    
+    NSString* sysName = [[UIDevice currentDevice] systemName];
+    NSString* sysVer = [[UIDevice currentDevice] systemVersion];
+    
+    res = [NSString stringWithFormat:@"%@ %@", sysName, sysVer];
+    
+    return res;
 }
 
 @end

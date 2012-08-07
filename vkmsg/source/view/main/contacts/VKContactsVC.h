@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "VKNavigationBar.h"
+#import "VKContactCell.h"
 
 typedef enum 
 {
@@ -16,7 +17,7 @@ typedef enum
     eVKContactsViewType_requests,
 } eVKContactsViewType;
 
-@interface VKContactsVC : UIViewController<UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, UISearchDisplayDelegate>
+@interface VKContactsVC : UIViewController<UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, UISearchDisplayDelegate, VKContactCellDelegate>
 {
     IBOutlet UITableView* _tableView;
     IBOutlet UISearchBar* _searchBar;

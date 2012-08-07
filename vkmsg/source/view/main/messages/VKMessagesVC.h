@@ -10,7 +10,7 @@
 #import "VKMessagesListCell.h"
 #import "VKNavigationBar.h"
 
-@interface VKMessagesVC : UIViewController <UITableViewDelegate, UITableViewDataSource>
+@interface VKMessagesVC : UIViewController <UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, UISearchDisplayDelegate>
 {
     IBOutlet UITableView* _tableView;
     IBOutlet VKNavigationBar* _navBar;
@@ -18,6 +18,8 @@
     IBOutlet UIActivityIndicatorView* _activityIndicator;
     
     BOOL _isLoadingMore;
+    
+    NSMutableArray* _searchDataSource;
 }
 
 - (void)onNewDialog:(id)sender;
